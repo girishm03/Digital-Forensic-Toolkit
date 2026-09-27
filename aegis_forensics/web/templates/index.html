@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aegis Forensics Command Center | DFIR Suite</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
+</head>
+<body>
+
+<!-- Scanline Overlay (Toggleable) -->
+<div id="scanlines-overlay" class="scanlines-overlay"></div>
+
+<div class="app-container">
+  
+  <!-- Left Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="aegis-shield-emblem">
+        <div class="shield-ring-outer"></div>
+        <div class="shield-ring-inner"></div>
+        <div class="shield-core">🛡️</div>
+      </div>
+      <div class="brand-text">
+        <h1>Aegis DFIR</h1>
+        <span>CYBER SHIELD COMMAND</span>
+      </div>
+    </div>
+
+    <div class="nav-menu">
+      <div class="nav-section-title">Command &amp; Vault</div>
+      <a class="nav-item active" data-tab="dashboard" id="nav-dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9"/><rect x="14" y="3" width="7" height="5"/><rect x="14" y="12" width="7" height="9"/><rect x="3" y="16" width="7" height="5"/></svg>
+        Command Center
+      </a>
+      <a class="nav-item" data-tab="vault" id="nav-vault">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><circle cx="12" cy="11" r="3"/></svg>
+        Evidence Vault &amp; CoC
+      </a>
+
+      <div class="nav-section-title">Artifact Examination</div>
+      <a class="nav-item" data-tab="file-analysis" id="nav-file-analysis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        File &amp; Magic Bytes
+      </a>
+      <a class="nav-item" data-tab="carver" id="nav-carver">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>
+        File Carver (Embedded)
+      </a>
+      <a class="nav-item" data-tab="pe-analysis" id="nav-pe-analysis">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/></svg>
+        PE Executable Triage
+      </a>
+      <a class="nav-item" data-tab="evtx" id="nav-evtx">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+        Windows Event Logs
+      </a>
+      <a class="nav-item" data-tab="browser" id="nav-browser">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/><line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/><line x1="14.83" y1="9.17" x2="19.07" y2="4.93"/><line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/></svg>
+        Browser History DB
+      </a>
+
+      <div class="nav-section-title">Live &amp; Network</div>
+      <a class="nav-item" data-tab="triage" id="nav-triage">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Live Host Triage
+      </a>
+      <a class="nav-item" data-tab="pcap" id="nav-pcap">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        PCAP Packet Forensics
+      </a>
+
+      <div class="nav-section-title">Threat Intel &amp; Correlation</div>
+      <a class="nav-item" data-tab="timeline" id="nav-timeline">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Supertimeline &amp; Alerts
+      </a>
+      <a class="nav-item" data-tab="mitre" id="nav-mitre">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+        MITRE ATT&amp;CK Matrix
+      </a>
+      <a class="nav-item" data-tab="intel" id="nav-intel">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Threat Intel Lookup
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="status-pill">
+        <span class="status-indicator"></span>
+        <span>SHIELD ONLINE</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <button id="toggle-sound-btn" class="btn-icon-toggle" title="Toggle Tactical Audio FX">🔇 SOUND</button>
+        <button id="toggle-scanlines-btn" class="btn-icon-toggle active" title="Toggle CRT Scanline HUD">📺 CRT</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main View Area -->
+  <main class="main-view">
+    
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="threat-level-ticker" id="threat-condition-ticker">
+          <span class="threat-dot" id="threat-condition-dot"></span>
+          <span>DEFCON 5: NORMAL DEFENSE</span>
+        </div>
+
+        <div class="active-case-badge">
+          <span class="badge-label">Active Case:</span>
+          <span class="badge-val" id="active-case-name">None Selected</span>
+        </div>
+
+        <select class="form-control" id="select-active-case" style="width:240px; font-size:12px; padding:6px 10px;">
+          <option value="">-- Select Case Vault --</option>
+        </select>
+      </div>
+
+      <div class="topbar-actions">
+        <span id="utc-clock" style="font-family:var(--font-mono); font-size:12px; color:var(--text-muted); margin-right:6px;"></span>
+        <button class="btn btn-secondary btn-sm" id="btn-new-case">+ New Case</button>
+        <button class="btn btn-primary btn-sm" id="btn-export-pdf" onclick="exportReport('pdf')">Export PDF</button>
+        <button class="btn btn-secondary btn-sm" id="btn-export-html" onclick="exportReport('html')">Export HTML</button>
+      </div>
+    </header>
+
+    <!-- Tab Panels Container -->
+    <div class="tab-content-container">
+
+      <!-- TAB 1: COMMAND CENTER DASHBOARD -->
+      <section class="tab-panel active" id="tab-dashboard">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Aegis Digital Forensics Command Center</h2>
+            <p>Real-time defensive triage telemetry, evidence custody baselines, and live incident operations.</p>
+          </div>
+          <!-- Radar Visual Widget -->
+          <div class="radar-widget-container">
+            <canvas id="radar-canvas" class="radar-canvas" width="120" height="120"></canvas>
+            <div>
+              <div style="font-family:var(--font-mono); font-size:11px; color:var(--accent-cyan); font-weight:700;">AEGIS SENTRY RADAR</div>
+              <div style="font-size:10px; color:var(--text-dim); margin-top:2px;">Real-time Telemetry Sweep</div>
+              <div style="font-size:10px; color:var(--accent-emerald); font-family:var(--font-mono); margin-top:4px;">● SECURE PATROL</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-4" style="margin-bottom: 24px;">
+          <div class="card">
+            <div class="card-title">Evidence Vault Items</div>
+            <div class="stat-value" id="stat-evidence-count" style="color:var(--accent-cyan);">0</div>
+            <div class="stat-desc">Cryptographically locked items</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Live Host Node</div>
+            <div class="stat-value" id="host-stat-name" style="font-size:18px; color:var(--accent-blue);">Scanning...</div>
+            <div class="stat-desc">Target forensic endpoint</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Host CPU &amp; Threads</div>
+            <div class="stat-value" id="host-stat-cpu" style="font-size:20px; color:var(--text-main);">-</div>
+            <div class="stat-desc">Processing capacity</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Physical Memory</div>
+            <div class="stat-value" id="host-stat-mem" style="font-size:18px; color:var(--accent-emerald);">-</div>
+            <div class="stat-desc">Volatile RAM state</div>
+          </div>
+        </div>
+
+        <div class="grid-2" style="margin-bottom: 24px;">
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Active Forensic Cases</span>
+              <button class="btn btn-secondary btn-sm" onclick="switchTab('vault')">Manage All Cases</button>
+            </div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Case ID</th>
+                    <th>Title</th>
+                    <th>Investigator</th>
+                    <th>Evidence</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody id="table-cases-body">
+                  <tr><td colspan="5" style="text-align:center;">Loading cases...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Sample Evidence Quick-Testing</span>
+            </div>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">
+              Ready-made synthetic evidence files synthesized for immediate demonstration:
+            </p>
+            <div id="samples-quick-load" style="display:flex; flex-direction:column; gap:8px;"></div>
+            <div style="margin-top:16px; padding:12px; background:rgba(0,255,200,0.06); border:1px solid rgba(0,255,200,0.2); border-radius:6px; font-size:12px; color:var(--text-muted);">
+              <strong>Tip:</strong> Click "Load Sample" to test extension spoofing detection on <code>suspicious_invoice.png</code> (a disguised PE file) or test PCAP packet analysis on <code>incident_capture.pcap</code>!
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 2: EVIDENCE VAULT & CHAIN OF CUSTODY -->
+      <section class="tab-panel" id="tab-vault">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Evidence Vault &amp; Chain of Custody Baseline</h2>
+            <p>ISO/IEC 27037 compliant evidence intake, cryptographic hashing (MD5, SHA-1, SHA-256, SHA-512), and tamper audit logs.</p>
+          </div>
+          <div>
+            <button class="btn btn-primary btn-sm" onclick="runIntegrityAudit()" id="btn-run-audit">Run Cryptographic Audit</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-title" style="margin-bottom:12px;">Ingest New Evidence Item to Vault</div>
+          <div class="grid-3" style="margin-bottom:12px;">
+            <div class="form-group">
+              <label class="form-label">Evidence File</label>
+              <input type="file" class="form-control" id="vault-file-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Descriptive Item Label</label>
+              <input type="text" class="form-control" id="vault-evidence-label" placeholder="e.g. Suspect Laptop Drive Image / Payload">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Investigator Intake Notes</label>
+              <input type="text" class="form-control" id="vault-evidence-notes" placeholder="e.g. Acquired from target workstation desktop">
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="uploadEvidenceToVault()" id="btn-ingest-vault">Compute Baselines &amp; Secure in Vault</button>
+        </div>
+
+        <div class="card" style="margin-bottom: 24px;">
+          <div class="card-header">
+            <span class="card-title">Preserved Evidence Items</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="dfir-table">
+              <thead>
+                <tr>
+                  <th>Evidence ID</th>
+                  <th>Label / Filename</th>
+                  <th>File Size</th>
+                  <th>SHA-256 Hash</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="table-evidence-body">
+                <tr><td colspan="6" style="text-align:center;">Select or open a case to view evidence items.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Chain of Custody (Immutable Audit Trail)</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="dfir-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Investigator</th>
+                  <th>Action</th>
+                  <th>Details &amp; Observations</th>
+                </tr>
+              </thead>
+              <tbody id="table-coc-body">
+                <tr><td colspan="4" style="text-align:center;">No custody log records available.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 3: FILE & MAGIC BYTE FORENSICS -->
+      <section class="tab-panel" id="tab-file-analysis">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>File &amp; Media Forensics</h2>
+            <p>Magic byte identification, extension spoofing alerts, EXIF &amp; GPS extraction, chunked entropy profiling, and interactive hex viewer.</p>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone-file" onclick="document.getElementById('input-file-analysis').click()">
+          <div class="dropzone-icon">📂</div>
+          <p>Drop file here or click to upload for forensic examination</p>
+          <span>Examines headers, magic signatures, EXIF, strings, IOCs, and entropy profile</span>
+          <input type="file" id="input-file-analysis" style="display:none;" onchange="analyzeFileUpload(this.files[0])">
+        </div>
+
+        <div id="file-analysis-results" style="display:none; margin-top: 24px;">
+          
+          <div id="fa-spoof-alert" class="card" style="display:none; background:rgba(244,63,94,0.15); border-color:var(--accent-magenta); color:var(--accent-magenta); margin-bottom:16px;"></div>
+
+          <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Cryptographic Identifiers &amp; Metadata</div>
+              <table class="dfir-table">
+                <tr><td style="width:120px;"><strong>File Name</strong></td><td id="fa-filename">-</td></tr>
+                <tr><td><strong>File Size</strong></td><td id="fa-size">-</td></tr>
+                <tr><td><strong>MD5</strong></td><td><code id="fa-md5" style="color:var(--accent-blue);">-</code></td></tr>
+                <tr><td><strong>SHA-1</strong></td><td><code id="fa-sha1" style="color:var(--accent-blue);">-</code></td></tr>
+                <tr><td><strong>SHA-256</strong></td><td><code id="fa-sha256" style="color:var(--accent-cyan); font-size:11px;">-</code></td></tr>
+                <tr><td><strong>Shannon Entropy</strong></td><td id="fa-entropy">-</td></tr>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Magic Byte Signature Verification</div>
+              <table class="dfir-table">
+                <tr><td style="width:120px;"><strong>First 16 Bytes</strong></td><td><code id="fa-magic-hex" style="color:#a7f3d0;">-</code></td></tr>
+                <tr><td><strong>Detected Format</strong></td><td id="fa-magic-type">-</td></tr>
+              </table>
+              
+              <div style="margin-top:16px;">
+                <div class="card-title" style="margin-bottom:6px; font-size:11px;">Chunked Entropy Profile (0 to 8 scale)</div>
+                <div id="fa-entropy-chart" style="display:flex; gap:2px; background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; border:1px solid var(--border-color);"></div>
+                <small style="color:var(--text-dim); display:block; margin-top:4px;">Magenta chunks (>7.1) indicate packed/encrypted data payloads.</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">EXIF &amp; GPS Geolocation Data</div>
+              <div id="fa-exif-data" style="max-height:280px; overflow-y:auto;"></div>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Extracted IOCs &amp; Strings</div>
+              <div id="fa-iocs-list" style="max-height:280px; overflow-y:auto; font-size:13px;"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <span class="card-title">Interactive Raw Hex Viewer</span>
+            </div>
+            <div class="hex-container" id="fa-hex-viewer"></div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 4: NEW FEATURE: FILE CARVER -->
+      <section class="tab-panel" id="tab-carver">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Forensic File Carver (Embedded Recoveries)</h2>
+            <p>Carve embedded images (JPEG, PNG), PDF documents, and ZIP archives from raw disk dumps, memory images, or corrupted containers.</p>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone-carver" onclick="document.getElementById('input-carver-file').click()">
+          <div class="dropzone-icon">✂️</div>
+          <p>Drop binary file / disk dump / memory segment to carve</p>
+          <span>Recovers embedded files via magic byte header and footer boundaries</span>
+          <input type="file" id="input-carver-file" style="display:none;" onchange="startFileCarving(this.files[0])">
+        </div>
+
+        <div id="carver-results" style="display:none; margin-top:24px;">
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-header">
+              <span class="card-title">Carved Files Extracted</span>
+              <span class="tag tag-success" id="carver-total-found" style="font-size:12px;">0</span>
+            </div>
+            <div id="carver-grid" class="carved-grid"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 5: PE EXECUTABLE FORENSICS -->
+      <section class="tab-panel" id="tab-pe-analysis">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Windows PE Executable Deep Dive</h2>
+            <p>Analyze PE32/PE32+ binaries (.exe, .dll, .sys), compile timestamp, section packing, import tables, and suspicious APIs.</p>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone-pe" onclick="document.getElementById('input-pe-analysis').click()">
+          <div class="dropzone-icon">⚙️</div>
+          <p>Drop Windows executable (.exe, .dll, .sys) or click to examine</p>
+          <span>Pefile binary header parser &amp; threat scoring</span>
+          <input type="file" id="input-pe-analysis" style="display:none;" onchange="analyzePEUpload(this.files[0])">
+        </div>
+
+        <div id="pe-analysis-results" style="display:none; margin-top: 24px;">
+          
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-header">
+              <span class="card-title">Malware / Threat Assessment Score</span>
+              <span id="pe-threat-score" style="font-weight:700; font-family:var(--font-mono); color:var(--accent-magenta);">0 / 100</span>
+            </div>
+            <div class="meter-bar">
+              <div class="meter-fill" id="pe-threat-fill" style="width:0%;"></div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom: 20px;">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">PE Header Overview</div>
+              <table class="dfir-table">
+                <tr><td style="width:140px;"><strong>Architecture</strong></td><td id="pe-arch">-</td></tr>
+                <tr><td><strong>Compile Timestamp</strong></td><td id="pe-compile-time">-</td></tr>
+                <tr><td><strong>Entry Point</strong></td><td><code id="pe-entry" style="color:var(--accent-blue);">-</code></td></tr>
+                <tr><td><strong>Subsystem</strong></td><td id="pe-subsystem">-</td></tr>
+              </table>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">High-Risk &amp; Injection APIs Detected</div>
+              <div id="pe-suspicious-apis" style="max-height:220px; overflow-y:auto; font-size:12px;"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">PE Binary Sections &amp; Entropy</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Section</th>
+                    <th>Virtual Address</th>
+                    <th>Virtual Size</th>
+                    <th>Raw Data Size</th>
+                    <th>Entropy</th>
+                    <th>Packed Status</th>
+                  </tr>
+                </thead>
+                <tbody id="pe-sections-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 6: EVTX EVENT LOG FORENSICS -->
+      <section class="tab-panel" id="tab-evtx">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Windows Event Log (.evtx) Forensics</h2>
+            <p>Parse Windows Security, System, and PowerShell logs for logons, brute-force patterns, process creation, and log-clearing alerts.</p>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone-evtx" onclick="document.getElementById('input-evtx-analysis').click()">
+          <div class="dropzone-icon">📋</div>
+          <p>Drop Windows Event Log (.evtx) file here</p>
+          <span>Extracts 4624 (Logon), 4625 (Failed Logon), 4688 (Process Created), 7045 (Service), 1102 (Log Cleared)</span>
+          <input type="file" id="input-evtx-analysis" accept=".evtx" style="display:none;" onchange="analyzeEVTXUpload(this.files[0])">
+        </div>
+
+        <div id="evtx-results" style="display:none; margin-top:24px;">
+          
+          <div id="evtx-tamper-alert" class="card" style="display:none; background:rgba(244,63,94,0.15); border-color:var(--accent-magenta); color:var(--accent-magenta); margin-bottom:16px;"></div>
+
+          <div class="grid-3" style="margin-bottom:20px;">
+            <div class="card">
+              <div class="card-title">Total Records Parsed</div>
+              <div class="stat-value" id="evtx-total-records">0</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Failed Logon Attempts</div>
+              <div class="stat-value" id="evtx-failed-logons" style="color:var(--accent-magenta);">0</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Suspicious Events</div>
+              <div class="stat-value" id="evtx-suspicious-events" style="color:var(--accent-amber);">0</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title" style="margin-bottom:12px;">Failed Logons (Potential Brute-Force / Password Spray)</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Timestamp</th>
+                    <th>Target User</th>
+                    <th>Domain</th>
+                    <th>Source IP</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="evtx-failed-logons-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title" style="margin-bottom:12px;">Security &amp; System Events Stream</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Event ID</th>
+                    <th>Event Classification</th>
+                    <th>Timestamp</th>
+                    <th>Severity</th>
+                    <th>Host Computer</th>
+                  </tr>
+                </thead>
+                <tbody id="evtx-events-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 7: BROWSER FORENSICS -->
+      <section class="tab-panel" id="tab-browser">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Browser Artifact Forensics</h2>
+            <p>Triage Chromium (Chrome, Edge, Brave) and Firefox databases: URL browsing history, file downloads, search queries, and timestamps.</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="loadLiveBrowsers()">Refresh Live Discovery</button>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:12px;">Live Browser Profiles Auto-Discovered on Host</div>
+          <div id="browser-live-profiles">Loading discovered browsers...</div>
+        </div>
+
+        <div class="dropzone" id="dropzone-browser" onclick="document.getElementById('input-browser-analysis').click()">
+          <div class="dropzone-icon">🌐</div>
+          <p>Drop browser SQLite database ('History' or 'places.sqlite')</p>
+          <span>Examines visited URLs, typed queries, and downloaded artifacts</span>
+          <input type="file" id="input-browser-analysis" style="display:none;" onchange="analyzeBrowserUpload(this.files[0])">
+        </div>
+
+        <div id="browser-results" style="display:none; margin-top:24px;">
+          
+          <div class="grid-3" style="margin-bottom:20px;">
+            <div class="card">
+              <div class="card-title">Browser Family</div>
+              <div class="stat-value" id="browser-family-tag" style="font-size:18px; color:var(--accent-blue);">-</div>
+            </div>
+            <div class="card">
+              <div class="card-title">History Records</div>
+              <div class="stat-value" id="browser-history-count" style="color:var(--accent-cyan);">0</div>
+            </div>
+            <div class="card">
+              <div class="card-title">File Downloads</div>
+              <div class="stat-value" id="browser-downloads-count" style="color:var(--accent-emerald);">0</div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title" style="margin-bottom:12px;">Recent Web Navigation History</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Visit Time (UTC)</th>
+                    <th>Page Title</th>
+                    <th>URL</th>
+                    <th>Visits</th>
+                  </tr>
+                </thead>
+                <tbody id="browser-history-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title" style="margin-bottom:12px;">Browser File Downloads</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Downloaded File</th>
+                    <th>Target Destination Path</th>
+                    <th>File Size</th>
+                    <th>Start Timestamp</th>
+                  </tr>
+                </thead>
+                <tbody id="browser-downloads-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 8: LIVE HOST TRIAGE -->
+      <section class="tab-panel" id="tab-triage">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Live Volatile Host Triage</h2>
+            <p>Volatile process memory, masquerading process heuristics, listening ports, remote connections, and persistence hooks.</p>
+          </div>
+          <button class="btn btn-primary btn-sm" onclick="refreshLiveTriage()">Refresh Triage Data</button>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-header">
+            <span class="card-title">Active Running Processes (with Anomaly Heuristics)</span>
+          </div>
+          <div class="table-wrapper">
+            <table class="dfir-table">
+              <thead>
+                <tr>
+                  <th>PID</th>
+                  <th>Process Name</th>
+                  <th>Executable Path</th>
+                  <th>User</th>
+                  <th>RAM %</th>
+                  <th>Forensic Assessment</th>
+                </tr>
+              </thead>
+              <tbody id="triage-proc-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Active Network Sockets &amp; Connections</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Proto</th>
+                    <th>Local Address</th>
+                    <th>Remote Address</th>
+                    <th>Status</th>
+                    <th>Process</th>
+                    <th>Threat Flag</th>
+                  </tr>
+                </thead>
+                <tbody id="triage-net-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title" style="margin-bottom:12px;">Persistence Mechanisms (Registry Run Keys)</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Location</th>
+                    <th>Entry Name</th>
+                    <th>Command Executed</th>
+                  </tr>
+                </thead>
+                <tbody id="triage-runkeys-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- TAB 9: PCAP PACKET FORENSICS -->
+      <section class="tab-panel" id="tab-pcap">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Network Forensics (PCAP / PCAPNG)</h2>
+            <p>Protocol breakdown, IP conversation flows, DNS query inspection with DGA detection, HTTP traffic, and TLS SNI extraction.</p>
+          </div>
+        </div>
+
+        <div class="dropzone" id="dropzone-pcap" onclick="document.getElementById('input-pcap-analysis').click()">
+          <div class="dropzone-icon">📡</div>
+          <p>Drop .pcap or .pcapng network capture file here</p>
+          <span>dpkt packet parser with conversation flow mapping</span>
+          <input type="file" id="input-pcap-analysis" accept=".pcap,.pcapng,.cap" style="display:none;" onchange="analyzePCAPUpload(this.files[0])">
+        </div>
+
+        <div id="pcap-results" style="display:none; margin-top:24px;">
+          <div class="grid-3" style="margin-bottom:20px;">
+            <div class="card">
+              <div class="card-title">Total Packets</div>
+              <div class="stat-value" id="pcap-total-pkts">0</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Volume Transferred</div>
+              <div class="stat-value" id="pcap-total-bytes" style="color:var(--accent-blue);">0 KB</div>
+            </div>
+            <div class="card">
+              <div class="card-title">Protocols Observed</div>
+              <div id="pcap-protocol-tags" style="margin-top:8px;"></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-bottom:20px;">
+            <div class="card-title" style="margin-bottom:12px;">Top IP Conversations (Network Flows)</div>
+            <div class="table-wrapper">
+              <table class="dfir-table">
+                <thead>
+                  <tr>
+                    <th>Conversation Flow (Source -> Destination)</th>
+                    <th>Protocol</th>
+                    <th>Packets</th>
+                    <th>Data Transferred</th>
+                  </tr>
+                </thead>
+                <tbody id="pcap-flows-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">DNS Queries (High-Entropy / DGA Highlighting)</div>
+              <div class="table-wrapper">
+                <table class="dfir-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Client IP</th>
+                      <th>Queried Domain</th>
+                      <th>Entropy</th>
+                      <th>Classification</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pcap-dns-body"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title" style="margin-bottom:12px;">Extracted Plaintext HTTP Requests</div>
+              <div class="table-wrapper">
+                <table class="dfir-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Method</th>
+                      <th>Host</th>
+                      <th>URI</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pcap-http-body"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- TAB 10: SUPERTIMELINE & ALERTS -->
+      <section class="tab-panel" id="tab-timeline">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Super-Timeline &amp; Anomaly Correlation</h2>
+            <p>Chronological multi-source correlation (File MACB, Windows Event Logs, Browser History, Network Packets) with threat pattern heuristics.</p>
+          </div>
+          <div style="display:flex; gap:10px;">
+            <button class="btn btn-secondary btn-sm" onclick="refreshTimeline()">Refresh Stream</button>
+            <button class="btn btn-danger btn-sm" onclick="clearTimeline()">Clear Timeline</button>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:12px;">Correlated Attack Anomalies &amp; Alerts</div>
+          <div id="timeline-anomalies">No anomalies detected.</div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Unified Chronological Event Stream</div>
+          <div id="timeline-stream-container" class="timeline-stream"></div>
+        </div>
+      </section>
+
+      <!-- TAB 11: NEW FEATURE: MITRE ATT&CK MATRIX -->
+      <section class="tab-panel" id="tab-mitre">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>MITRE ATT&amp;CK Tactics &amp; Techniques Matrix</h2>
+            <p>Automated correlation of forensic anomalies to enterprise tactics (Execution, Persistence, Defense Evasion, Credential Access, C2).</p>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="refreshMITREMatrix()">Refresh Mapping</button>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:12px;">Tactics Activity Breakdown</div>
+          <div id="mitre-tactics-bar" class="mitre-tactics-bar"></div>
+        </div>
+
+        <div class="card">
+          <div class="card-title" style="margin-bottom:12px;">Mapped Threat Techniques &amp; Evidence</div>
+          <div id="mitre-techniques-list">Loading MITRE mappings...</div>
+        </div>
+      </section>
+
+      <!-- TAB 12: NEW FEATURE: THREAT INTEL LOOKUP -->
+      <section class="tab-panel" id="tab-intel">
+        <div class="panel-header">
+          <div class="panel-title">
+            <h2>Cyber Threat Intelligence (CTI) Indicator Lookup</h2>
+            <p>Query cryptographic hashes, IPv4 endpoints, and domain names against reputation feeds, actor attributions, and known malware families.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:20px;">
+          <div class="card-title" style="margin-bottom:12px;">Search Indicator of Compromise (IOC)</div>
+          <div style="display:flex; gap:12px;">
+            <input type="text" id="intel-ioc-input" class="form-control" placeholder="Enter MD5, SHA-256, IPv4 address (e.g. 104.28.19.44), or domain..." style="flex:1;">
+            <button class="btn btn-primary" onclick="executeIntelLookup()">Lookup Threat Reputation</button>
+          </div>
+        </div>
+
+        <div id="intel-results" style="display:none;"></div>
+      </section>
+
+    </div>
+  </main>
+
+</div>
+
+<!-- Modal: New Investigation Case -->
+<div class="modal-overlay" id="modal-new-case">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">Establish Forensic Investigation Case</div>
+      <button class="btn-close-modal" style="background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:18px;">&times;</button>
+    </div>
+    <form id="form-create-case">
+      <div class="form-group">
+        <label class="form-label">Case Identifier</label>
+        <input type="text" name="case_id" class="form-control" placeholder="e.g. CASE-2026-001" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Case Title</label>
+        <input type="text" name="title" class="form-control" placeholder="e.g. Workstation Intrusion Triage" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Lead Investigator</label>
+        <input type="text" name="investigator" class="form-control" placeholder="e.g. Agent J. Doe" required>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Organization / Agency</label>
+        <input type="text" name="organization" class="form-control" value="Cyber Incident Response Unit">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Target System / Hostname</label>
+        <input type="text" name="target_system" class="form-control" placeholder="e.g. FIN-WS-09">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Investigation Scope &amp; Summary</label>
+        <textarea name="description" class="form-control" rows="3" placeholder="Brief statement of investigative hypothesis or incident triggers"></textarea>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+        <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Case File</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toast Notifications Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<script src="/static/js/app.js"></script>
+</body>
+</html>

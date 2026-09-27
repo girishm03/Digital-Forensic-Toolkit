@@ -1,0 +1,11 @@
+fastapi>=0.110.0
+uvicorn>=0.28.0
+pydantic>=2.6.0
+python-multipart>=0.0.9
+psutil>=5.9.0
+pillow>=10.2.0
+cryptography>=42.0.0
+reportlab>=4.1.0
+dpkt>=1.9.8
+python-evtx>=0.8.1
+pefile>=2024.8.26
