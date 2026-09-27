@@ -61,8 +61,8 @@ Whether investigating ransomware intrusions, disguised trojans, or volatile host
 
 ### 2. Clone the Repository
 ```bash
-git clone https://github.com/your-username/Digital-Forensics-Toolkit.git
-cd Digital-Forensics-Toolkit
+git clone https://github.com/girishm03/Digital-Forensic-Toolkit-.git
+cd Digital-Forensic-Toolkit-
 ```
 
 ### 3. Install Dependencies
@@ -267,7 +267,7 @@ Key capabilities engineered into Aegis:
 Built with: Python, FastAPI, dpkt, pefile, python-evtx, ReportLab, and modern CSS/JS.
 
 Check out the GitHub repository and let me know your thoughts:
-🔗 [Insert Your GitHub Repo Link Here]
+🔗 https://github.com/girishm03/Digital-Forensic-Toolkit-
 
 #Cybersecurity #DigitalForensics #DFIR #IncidentResponse #Python #InfoSec #ThreatHunting #MITREATTACK #SOCAnalyst #MalwareAnalysis #BlueTeam
 ```
