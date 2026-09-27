@@ -1051,12 +1051,23 @@ function renderCarvedResults(data) {
 // ==================== NEW FEATURE: MITRE ATT&CK MATRIX ====================
 
 async function refreshMITREMatrix() {
+  const techContainer = document.getElementById("mitre-techniques-list");
+  if (techContainer) {
+    techContainer.innerHTML = '<p style="color:var(--text-dim); padding:16px;">Correlating enterprise TTPs across artifacts...</p>';
+  }
   try {
     const res = await fetch("/api/mitre");
+    if (!res.ok) {
+      throw new Error(`Server returned status ${res.status}`);
+    }
     const data = await res.json();
     renderMITREMatrix(data);
   } catch (err) {
     console.error("MITRE load error:", err);
+    if (techContainer) {
+      techContainer.innerHTML = `<div class="card" style="border-color:var(--accent-magenta);"><p style="color:var(--accent-magenta);">Error loading MITRE Matrix: ${escapeHtml(err.message)}</p></div>`;
+    }
+    showToast("Error loading MITRE ATT&CK Matrix: " + err.message, "error");
   }
 }
 
@@ -1084,14 +1095,14 @@ function renderMITREMatrix(data) {
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <div>
           <span class="tag tag-danger">${t.id}</span>
-          <strong style="margin-left:8px; font-size:14px;">${t.name}</strong>
-          <span class="tag tag-info" style="margin-left:8px;">${t.tactic}</span>
+          <strong style="margin-left:8px; font-size:14px;">${escapeHtml(t.name)}</strong>
+          <span class="tag tag-info" style="margin-left:8px;">${escapeHtml(t.tactic)}</span>
         </div>
         <a href="${t.url}" target="_blank" class="btn btn-secondary btn-sm">MITRE ATT&CK &nearr;</a>
       </div>
-      <p style="font-size:12px; color:var(--text-muted); margin:8px 0 6px 0;">${t.description}</p>
+      <p style="font-size:12px; color:var(--text-muted); margin:8px 0 6px 0;">${escapeHtml(t.description)}</p>
       <div style="font-size:11px; color:var(--accent-cyan); font-family:var(--font-mono);">
-        Detections (${t.detection_count}): ${t.evidence_samples[0] ? escapeHtml(t.evidence_samples[0].slice(0, 100)) : ''}...
+        Forensic Signal (${t.detection_count}): ${t.evidence_samples && t.evidence_samples[0] ? escapeHtml(String(t.evidence_samples[0]).slice(0, 100)) : 'Artifact Detected'}...
       </div>
     </div>
   `).join("");
