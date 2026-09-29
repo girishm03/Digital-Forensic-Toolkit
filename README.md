@@ -80,6 +80,31 @@ Open **[http://127.0.0.1:8080](http://127.0.0.1:8080)** in your browser.
 
 ---
 
+## ☁️ Deploy to Vercel
+
+Aegis is pre-configured and 100% deployment-ready for **Vercel** serverless hosting using `vercel.json` and `@vercel/python`.
+
+### Option A: Deploy via GitHub (Recommended)
+1. Push your repository to GitHub (or fork this repo).
+2. Go to [Vercel Dashboard](https://vercel.com/dashboard) and click **"Add New" > "Project"**.
+3. Import your GitHub repository (`Digital-Forensic-Toolkit-`).
+4. Keep the default settings (Framework Preset: **Other**, Root Directory: `./`).
+5. Click **Deploy**. Vercel will install dependencies from `requirements.txt` and launch the serverless FastAPI app at your custom `.vercel.app` domain!
+
+### Option B: Deploy via Vercel CLI
+```bash
+# Install Vercel CLI (if not installed)
+npm install -g vercel
+
+# Deploy preview
+vercel
+
+# Deploy production
+vercel --prod
+```
+
+---
+
 ## 🖥️ Web Command Center Walkthrough
 
 The Aegis Web GUI is crafted with a cyber-tactical aesthetic:

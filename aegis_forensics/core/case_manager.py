@@ -2,6 +2,7 @@ import os
 import json
 import uuid
 import datetime
+import tempfile
 from typing import Dict, Any, List, Optional
 from aegis_forensics.core.hashing import calculate_hashes, verify_file_integrity
 
@@ -9,9 +10,20 @@ class CaseManager:
     """
     Manages forensic cases, evidence registration, and immutable Chain of Custody records.
     """
-    def __init__(self, base_dir: str = "cases"):
+    def __init__(self, base_dir: Optional[str] = None):
+        if base_dir is None:
+            if os.environ.get("VERCEL") or os.environ.get("AWS_LAMBDA_FUNCTION_NAME"):
+                base_dir = os.path.join(tempfile.gettempdir(), "aegis_cases")
+            else:
+                base_dir = os.environ.get("AEGIS_CASES_DIR", "cases")
+
         self.base_dir = os.path.abspath(base_dir)
-        os.makedirs(self.base_dir, exist_ok=True)
+        try:
+            os.makedirs(self.base_dir, exist_ok=True)
+        except OSError:
+            self.base_dir = os.path.join(tempfile.gettempdir(), "aegis_cases")
+            os.makedirs(self.base_dir, exist_ok=True)
+
 
     def create_case(
         self,

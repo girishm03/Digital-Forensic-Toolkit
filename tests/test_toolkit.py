@@ -107,7 +107,7 @@ def test_file_analyzer_magic_and_spoofing():
             os.remove(f_path)
 
 def test_pcap_analyzer():
-    sample_pcap = r"f:\Cyber Security Projects\Digital Forensics Toolkit\aegis_forensics\samples\incident_capture.pcap"
+    sample_pcap = os.path.join(os.path.dirname(__file__), "..", "aegis_forensics", "samples", "incident_capture.pcap")
     if os.path.exists(sample_pcap):
         res = analyze_pcap(sample_pcap)
         assert res["total_packets"] >= 3

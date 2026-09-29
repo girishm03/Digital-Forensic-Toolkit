@@ -112,7 +112,12 @@ def triage_network_connections() -> List[Dict[str, Any]]:
         except Exception:
             pass
 
-    for conn in psutil.net_connections(kind='inet'):
+    try:
+        raw_conns = psutil.net_connections(kind='inet')
+    except Exception:
+        raw_conns = []
+
+    for conn in raw_conns:
         try:
             laddr = f"{conn.laddr.ip}:{conn.laddr.port}" if conn.laddr else ""
             raddr = f"{conn.raddr.ip}:{conn.raddr.port}" if conn.raddr else ""
